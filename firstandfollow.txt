@@ -1,0 +1,99 @@
+#include <iostream>
+#include <ctype.h>
+#include <cstring>
+#include <stdlib.h>
+#include <string.h>
+
+using namespace std;
+
+char productions[30][30],result[30],fresult[30];
+
+void find_first(char productions[30][30],int n,char x){
+    int i,j = 0;
+    char subresult;
+    for(i = 0 ; i < n; i++){
+        if(productions[i][0] == x){
+            if(isupper(productions[i][3])){
+                subresult = productions[i][3];
+                find_first(productions,n,subresult);
+            }
+            else{
+                result[j++] = productions[i][3];
+            }
+        }
+    }
+    result[j] = '\0';
+    if(i == n){
+        for(int i = 0 ; result[i] != '\0' ; i++){
+        cout<<result[i]<<" ";
+    }
+    cout<<endl;
+    }
+}
+void find_first_follow(char productions[30][30], int n , char x , int j){
+    int i;
+    char subresult;
+    for(i = 0 ; i < n; i++){
+        if(productions[i][0] == x){
+            if(isupper(productions[i][3])){
+                subresult = productions[i][3];
+                find_first_follow(productions,n,subresult,j);
+            }
+            else{
+                fresult[j++] = productions[i][3];
+            }
+        }
+    }
+}
+void find_follow(char productions[30][30], int n , char x){
+    int i,j = 1,found = 0;
+    fresult[0] = '$';
+    for(i = 0 ; i < n ; i++){
+        for(int k  = 3 ; k < strlen(productions[i]) ; k++){
+            if(productions[i][k] == x){
+                if(k==(strlen(productions[i])-1)){
+                    find_follow(productions,n,productions[i][0]);
+                }
+                if(productions[i][k] == x){
+                    if(!isupper(productions[i][k+1])){
+                    for(int l = 0 ; l < strlen(fresult) ; l++){
+                        if(productions[i][k+1] == fresult[l])
+                        {
+                            found = 1;
+                        }
+                    }
+                    if (found == 0){
+                        fresult[j++] = productions[i][k+1];
+                }
+                }
+                }
+                if(productions[i][k] == x){
+                    if(isupper(productions[i][k+1])){
+                        find_first_follow(productions,n,productions[i][k+1],j);
+                    }
+                }
+            }
+        }
+    }
+    fresult[j] = '\0';
+    if(i == n){
+      for(int i = 0 ; i < fresult[i] != '\0' ; i++){
+        cout<<fresult[i]<<" ";
+      }
+    }
+}
+int main(){
+    int n;
+    char x;
+    cout<<"Enter the number of productions: ";
+    cin>>n;
+    cout<<"Enter the productions: ";
+    for(int i = 0 ; i < n ; i++){
+        cin>>productions[i];
+    }
+    cout<<"Enter the terminal to find the first off: ";
+    cin>>x;
+    find_first(productions,n,x);
+    find_follow(productions,n,x);
+    return 0;
+}
